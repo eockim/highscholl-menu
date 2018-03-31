@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<meta charset="UTF-8">
+	<title> ddok  </title>
+	<script src="components/jquery/dist/jquery.min.js"></script>
+</head>
+<body>
+
+	<video controls>
+		<source src="videos/20170613.mp4" type="video/mp4"/>
+		Your browser does not support the audio element.
+	</video>
+	<div>test</div>	
+	
+	<script>
+		$(document).ready(function(){
+			
+			var numberArray = 'ab2v9b9999999999999c13j5jf4jv21'.match(/\d+/g);
+			var result = 0;
+			numberArray.sort(function(a,b){
+				return a -b;
+			});
+			
+			for( index in numberArray){
+				
+				if(numberArray[index]%2 != 0){
+					result += Math.pow(numberArray[index], 2);
+				}
+			}
+			
+			//alert(result);
+			
+		});
+	</script>
+</body>
+</html>
