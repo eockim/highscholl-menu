@@ -16,5 +16,7 @@
     "url": "https://github.com/eockim/highscholl-menu/issues"
   },
   "homepage": "https://github.com/eockim/highscholl-menu#readme",
-  "dependencies": {}
+  "dependencies": {
+    "config": "^1.30.0"
+  }
 }

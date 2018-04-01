@@ -1,0 +1,16 @@
+{
+  "distributor" : {
+    "port" : "9001",
+    "interval" : 4000,
+    "serviceName" : "distributor",
+    "urls" : ["POST/distributes", "GET/distributes"]
+  },
+  "micro1": {
+    "connect" : {
+      "serviceName" : "micro1",
+      "port" : "9010",
+      "urls" : ["POST/micro", "POST/micro22"]
+
+    }
+  }
+}

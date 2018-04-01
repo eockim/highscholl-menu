@@ -2,6 +2,7 @@
 
 const net = require('net');
 const tcpClient = require('./tcp-client.js');
+const config = require('config').get('distributor');
 
 class tcpServer{
   constructor(name, port, urls){
@@ -85,7 +86,7 @@ class tcpServer{
         if (isConnectedDistributor != true) {
             this.clientDistributor.connect();
         }
-    }, 3000);
+    }, config.interval);
   }
 }
 

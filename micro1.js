@@ -1,10 +1,13 @@
 'use strict';
+var config = require('config');
+const connect = config.get('micro1.connect');
 
 class micro extends require('./tcp-server.js'){
 
   constructor(){
 
-    super("micro", process.argv[2] ? Number(process.argv[2]) : 9010, ["POST/micro", "POST/micro22"]);
+    console.log('process', process);
+    super(connect.serviceName, process.argv[2] ? Number(process.argv[2]) : connect.port, connect.urls);
 
     this.connectToDistributor("127.0.0.1", 9001, (data) => {
       console.log("Distributor Notification", data);

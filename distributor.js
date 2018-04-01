@@ -1,7 +1,9 @@
 var map = {};
+const config = require('config').get('distributor');
+
 class distributor extends require("./tcp-server.js"){
   constructor(){
-    super("distributor", 9001, ["POST/distributes", "GET/distributes"]);
+    super(config.serviceName, config.port, config.urls);
   }
 
   onCreate(socket){
