@@ -15,7 +15,7 @@ class micro extends require('./tcp-server.js'){
   }
 
   onRead(socket, data){
-    console.log("onRead-micro1", socket.remoteAddress, socket.remotePort, data);
+    console.log("onRead--micro1", socket.remoteAddress, socket.remotePort, data);
   }
 
 }
