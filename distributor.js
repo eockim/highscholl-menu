@@ -24,7 +24,7 @@ class distributor extends require("./tcp-server.js"){
     var key = socket.remoteAddress + ":" + socket.remotePort;
     console.log("onRead-distributor", socket.remoteAddress, socket.remotePort);
 
-    if (json.uri == "/distributes" && json.method == "POST") {
+    if(json.uri == "/distributes" && json.method == "POST") {
 
         map[key] = {
             socket : socket

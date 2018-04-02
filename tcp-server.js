@@ -52,13 +52,13 @@ class tcpServer{
 
   }
 
-  // onCreate(socket){
-  //   console.log('onCreate', socket.remoteAddress, socket.remotePort);
-  // }
-  //
-  // onClose(socket){
-  //   console.log('onClose', socket.remoteAddress, socket.remotePort);
-  // }
+  onCreate(socket){
+    console.log('onCreate', socket.remoteAddress, socket.remotePort);
+  }
+
+  onClose(socket){
+    console.log('onClose', socket.remoteAddress, socket.remotePort);
+  }
 
   connectToDistributor(host, port, onNoti) {
 

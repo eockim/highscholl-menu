@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/eockim/highscholl-menu#readme",
   "dependencies": {
-    "config": "^1.30.0"
+    "config": "^1.30.0",
+    "jsdom": "^11.7.0"
   }
 }

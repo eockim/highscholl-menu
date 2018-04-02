@@ -5,6 +5,8 @@ const net = require('net');
 class tcpClient{
 
   constructor(host, port, onCreate, onRead, onEnd, onError){
+
+    console.log('tcp client constructor------');
     this.options = { host: host, port: port};
 
     this.onCreate = onCreate;
@@ -21,6 +23,7 @@ class tcpClient{
     });
 
     this.client.on('data', (data) =>{
+      console.log('client data....');
       var sz = this.merge ? this.merge + data.toString() : data.toString();
       var arr = sz.split('¶');
 
@@ -34,13 +37,12 @@ class tcpClient{
           this.onRead(this.options, JSON.parse(arr[i]));
         }
       }
-
-      console.log('json parse', arr);
     });
 
     this.client.on('close', () =>{
+      console.log('close clinet1');
       if(this.onEnd){
-
+        console.log('close client');
         this.onEnd(this.options);
       }
     });
