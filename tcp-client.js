@@ -6,9 +6,7 @@ class tcpClient{
 
   constructor(host, port, onCreate, onRead, onEnd, onError){
 
-    console.log('tcp client constructor------');
     this.options = { host: host, port: port};
-
     this.onCreate = onCreate;
     this.onRead = onRead;
     this.onEnd = onEnd;
@@ -23,7 +21,6 @@ class tcpClient{
     });
 
     this.client.on('data', (data) =>{
-      console.log('client data....');
       var sz = this.merge ? this.merge + data.toString() : data.toString();
       var arr = sz.split('¶');
 
@@ -40,9 +37,7 @@ class tcpClient{
     });
 
     this.client.on('close', () =>{
-      console.log('close clinet1');
       if(this.onEnd){
-        console.log('close client');
         this.onEnd(this.options);
       }
     });

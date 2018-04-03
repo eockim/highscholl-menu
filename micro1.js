@@ -15,19 +15,16 @@ class micro extends require('./tcp-server.js'){
   }
 
   onRead(socket, data){
-    console.log("onRead-micro1", socket.remoteAddress, socket.remotePort, data);
 
-    business.requestMenu((response, socket) =>{
+    console.log("onRead-micro1", socket.remoteAddress, socket.remotePort);
 
-      console.log('response', response);
+    business.requestMenu(data.params, (packet) =>{
 
-    });
-  }
+      socket.write(JSON.stringify(packet) + '¶');
 
-  onClose(socket){
-    console.log('onClose-micro1");')
-  }
-
+    } );
+    //socket.write('{"errorcode":0,"errormessage":"success","key":0,"data":{"date":"2018.04.03","type":"중식","menu":"혼합곡밥,육개장,수제피자치킨커틀렛,매콤두부참치조림,오이..","kal":"1608 kcal"}}' + '¶');
+  };
 }
 
 new micro();

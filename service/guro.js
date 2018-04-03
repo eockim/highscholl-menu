@@ -8,8 +8,14 @@ var options = {};
 
 promiseArray = [];
 
+var response = {
+     //key: params.key,
+     errorcode: 0,
+     errormessage: "success"
+ };
 
-var menu = function(guroMenuIndex, res, callBack){
+
+var menu = function(guroMenuIndex, params, callBack){
 
   for (var i = 0; i < guroMenuIndex; i++) {
 
@@ -18,15 +24,17 @@ var menu = function(guroMenuIndex, res, callBack){
   }
 
   Promise.all(promiseArray).then(function(value) {
-    //console.log('promise');
+    console.log('promise');
     //console.log('value', value);
 
     Post.addArray(value);
     Post.empty();
     Post.regExp(Post.array()[0][0]);
 
+    response.key = params.key;
+    response.data = Post.array()[0][0];
 
-    callBack(Post.array()[0][0]);
+    callBack(response);
 
     Post.initArray();
 
@@ -35,7 +43,7 @@ var menu = function(guroMenuIndex, res, callBack){
   });
 }
 
-exports.requestMenu = function(callBack, res){
+exports.requestMenu = function(params, callBack){
 
   console.log('today', Today.yearStr(), Today.monthStr());
   options = {
@@ -58,7 +66,8 @@ exports.requestMenu = function(callBack, res){
           guroMenuIndex = dom.window.document.querySelectorAll('.board_type01_pagenate a').length;
 
           console.log('guroMenuIndex', guroMenuIndex);
-          menu(guroMenuIndex, res, callBack);
+
+          menu(guroMenuIndex, params, (s) => process.nextTick(callBack, s) );
       }
 
   });

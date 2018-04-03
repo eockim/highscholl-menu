@@ -53,7 +53,7 @@ var server = http.createServer((req,res) =>{
 
 
   var isConnectedDistributor = false;
-
+  console.log('isConnectedDistributor',isConnectedDistributor );
   this.clientDistributor = new tcpClient(
     "127.0.0.1",
     9001,
@@ -77,7 +77,8 @@ var server = http.createServer((req,res) =>{
 // API 호출 처리
 function onRequest(res, method, pathname, params) {
 
-    console.log('pathname', pathname);
+    console.log('params', params);
+    //console.log('res', res);
     var key = method + pathname;
     var client = mapUrls[key];
 
@@ -134,21 +135,25 @@ function onDistribute(data) {
               mapUrls[key].push(client);
           }
           client.connect();
-          console.log('connnet...');
         }
     }
 }
 
 // 마이크로서비스 접속 이벤트 처리
 function onCreateClient(options) {
-    console.log("onCreateClient -gate");
+    console.log("onCreateClient -gate", options);
 }
 
 // 마이크로서비스 응답 처리
 function onReadClient(options, packet) {
-    console.log("onReadClient -gate", packet);
+
+    console.log("onReadClient -gate");
+
+    var result = JSON.parse(JSON.stringify(packet));
+    delete result.key;
+
     mapResponse[packet.key].writeHead(200, { 'Content-Type': 'application/json' });
-    mapResponse[packet.key].end(JSON.stringify(packet));
+    mapResponse[packet.key].end(JSON.stringify(result));
     delete mapResponse[packet.key];                         // http 응답객체 삭제
 }
 
