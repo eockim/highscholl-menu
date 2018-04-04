@@ -16,7 +16,6 @@ class distributor extends require("./tcp-server.js"){
     console.log("onClose-distributor", socket.remoteAddress, socket.remotePort);
     delete map[key];
 
-    console.log(map);
     this.sendInfo();
   }
 
