@@ -3,7 +3,7 @@ var config = require('config');
 var business =require('./service/guro.js');
 const connect = config.get('micro1.connect');
 const cluster = require('cluster');
-let elastic = require('./elastic.js').connect;
+const elastic = require('./elastic.js').connect;
 const numCPU = require('os').cpus().length;
 
 class micro extends require('./tcp-server.js'){
@@ -40,11 +40,11 @@ if(cluster.isMaster){
 
   cluster.on('exit', (worker, code, signal) => {        // 6. 자식 프로세스 종료 이벤트 감지
     console.log('worker ${worker.process.pid} died');
-    elastic.index({
-      index: 'microservice',                          // index
-      type: 'logs',                                   // type
-      body: 'body-1234'
-    });
+    // elastic.index({
+    //   index: 'microservice',                          // index
+    //   type: 'logs',                                   // type
+    //   body: 'body-1234'
+    // });
     cluster.fork();
   });
 }else{
