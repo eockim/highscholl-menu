@@ -13,30 +13,55 @@ promiseArray = [];
 var response = {
      //key: params.key,
      errorcode: 0,
-     errormessage: "success"
+     errormessage: "success",
+     data : {
+       menu : []
+     }
  };
 
 
 var menu = function(guroMenuIndex, params, callBack){
 
   for (var i = 0; i < guroMenuIndex; i++) {
-
-    var promise = Post.post(i + 1);
+    console.log('promise for');
+    var promise = Post.sendPost(i + 1);
     promiseArray.push(promise);
   }
 
   Promise.all(promiseArray).then(function(value) {
 
+    console.log('promiseArray', promiseArray);
     Post.addArray(value);
     Post.empty();
-    Post.regExp(Post.array()[0][0]);
-
+    //Post.regExp(Post.array()[0][0]);
     response.key = params.key;
+
+    console.log('post arry', Post.array());
+    console.log(Post.array()[0][0]);
+    console.log(Post.array()[0][1]);
     response.data = Post.array()[0][0];
+
+    var redisArray = [];
+    for(var i = 0; i < Post.array()[0].length; i++){
+
+      if(Post.array()[0][i].menu.length != 0 ){
+        redisArray.push(Post.array()[0][i].menu);
+      }
+    }
+
+    console.log('redisArray', redisArray);
+
+    for(var i = 0 ;i < redisArray.length; i++ ){
+      redis.hset("today", redisArray[i].type, redisArray[i].menu, redis.print);
+    }
+
+
+    //redis.quit();
 
     callBack(response);
 
     Post.initArray();
+    //redis.quit();
 
   }).catch(function(error) {
     console.log('error : ', error);
@@ -45,18 +70,29 @@ var menu = function(guroMenuIndex, params, callBack){
 
 exports.requestMenu = function(params, callBack){
 
-  redis.get('today', (err, reply) =>{
+  redis.hgetall('today', (err,replies) =>{
 
-    console.log('reply', reply);
     console.log('err', err);
-    console.log(reply === null);
-    console.log(reply !== null);
-    if(reply === null){
-
+    if(replies === null){
       Post.initPost(params, callBack);
+    }else if(!err && replies){
+
+      response.key = params.key;
+      response.data.menu = [];
+      for (var key in replies) {
+
+        var obj = {};
+        obj.type = key;
+        obj.menu = replies[key];
+        response.data.menu.push(obj)
+      }
+      //redis.quit();
+      return process.nextTick(callBack, response);
     }
 
   });
+
+
 
 }
 
@@ -173,8 +209,7 @@ var Post = (function() {
 
     var sendPost = function(index) {
 
-        //console.log('index',index);
-        options.url = 'http://www.guro.hs.kr/17572/subMenu.do?viewType=list&siteId=SEI_00000919&pageIndex=' + index + '&arrMlsvId=0&srhMlsvYear=' + Today.yearStr() + '&srhMlsvMonth=' + Today.monthStr();
+        options.url = 'http://www.guro.hs.kr/17572/subMenu.do?viewType=list&siteId=SEI_00000919&pageIndex=' + index + '&arrMlsvId=0&srhMlsvYear=' + Today.yearStr() + '&srhMlsvMonth=' + 03/**Today.monthStr()*/;
         var promise = new Promise(function(resolve, reject) {
 
             request.post(options, function(error, response, body) {
@@ -185,12 +220,11 @@ var Post = (function() {
 
                     var menu = new Menu(dom.window.document.querySelectorAll('.board_type01_tb_list tbody tr'));
 
-                    //console.log('menuobject', menu.menuObject());
                     //addArray(menu.menuObject());
                     //console.log('getArray', getArray());
 
                     //console.log('pageIndex', pageIndex);
-                    resolve(menu.menuObject());
+                    resolve(menu.getMenuObject());
                 }
             });
             // do a thing, possibly async, then…
@@ -203,7 +237,8 @@ var Post = (function() {
     var initPost = function(params, callBack){
 
       options = {
-        url: 'http://www.guro.hs.kr/17572/subMenu.do?viewType=list&siteId=SEI_00000919&pageIndex=1&arrMlsvId=0&srhMlsvYear=' + Today.yearStr() + '&srhMlsvMonth=' + Today.monthStr(),
+        //url: 'http://www.guro.hs.kr/17572/subMenu.do?viewType=list&siteId=SEI_00000919&pageIndex=1&arrMlsvId=0&srhMlsvYear=' + Today.yearStr() + '&srhMlsvMonth=' + Today.monthStr(),
+        url : 'http://www.guro.hs.kr/17572/subMenu.do?viewType=list&siteId=SEI_00000919&pageIndex=1&arrMlsvId=0&srhMlsvYear=2018&srhMlsvMonth=03',
         method: 'POST',
         headers: {
           'User-Agent': 'Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Safari/537.36',
@@ -229,7 +264,7 @@ var Post = (function() {
     }
 
     return {
-        post: sendPost,
+        sendPost: sendPost,
         index: getIndex,
         addIndex: addIndex,
         addArray: addArray,
@@ -259,7 +294,7 @@ Menu.prototype = function() {
 
     var getMenuObject = function() {
 
-        var object = {};
+        var result = {'menu' : []};
         //console.log(this.dom[0].innerHTML);
         //console.log(this.dom[0].querySelctorAll('td'));
         for (var i = 0; i < this.dom.length; i++) {
@@ -274,31 +309,33 @@ Menu.prototype = function() {
             //console.log(td);
             //console.log(trDom.window.document.querySelectorAll('td')[0].textContent );
             //console.log('textcontent',td[0].textContent);
-            if (td[0].textContent.trim() === Today.fullStr()) {
+            var object = {};
+            if (td[0].textContent.trim() === /**Today.fullStr()*/ '2018.03.05') {
                 object.date = td[0].textContent;
-                object.type = td[1].textContent;
+                object.type = (td[1].textContent.trim() === "중식"? "1" : td[1].textContent.trim() === "석식" ? "2" : "0");
                 object.menu = td[3].textContent;
                 object.kal = td[4].textContent;
 
-                //this.menu.push(object);
+                Post.regExp(object);
+                result.menu.push(object);
+            }
+
+            if(i == this.dom.length -1 &&  result.menu.length == 0){
+              result.menu.push(object);
             }
 
         }
-        return object;
+
+        return result;
         //console.log('object', object);
 
         //console.log('this.menu',this.menu);
 
     }
 
-    var getMenuArray = function() {
-        return this.menu;
-    }
-
     return {
         menuList: getMenuList,
-        menuObject: getMenuObject,
-        menuArray: getMenuArray
+        getMenuObject: getMenuObject
     }
 
 }();
