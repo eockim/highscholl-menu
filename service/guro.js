@@ -1,3 +1,4 @@
+'use strict';
 var exports = module.exports = {};
 var request = require('request');
 const jsdom = require('jsdom');
