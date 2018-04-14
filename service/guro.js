@@ -1,3 +1,4 @@
+'use strict';
 var exports = module.exports = {};
 var request = require('request');
 const jsdom = require('jsdom');
@@ -8,7 +9,7 @@ const {
 const redis = require("redis").createClient(6379,'redis1');
 var options = {};
 
-promiseArray = [];
+var promiseArray = [];
 
 var response = {
      //key: params.key,
@@ -30,28 +31,35 @@ var menu = function(guroMenuIndex, params, callBack){
 
   Promise.all(promiseArray).then(function(value) {
 
-    console.log('promiseArray', promiseArray);
+    //console.log('promiseArray', promiseArray);
+
     Post.addArray(value);
     Post.empty();
     //Post.regExp(Post.array()[0][0]);
     response.key = params.key;
 
-    console.log('post arry', Post.array());
-    console.log(Post.array()[0][0]);
-    console.log(Post.array()[0][1]);
+    // console.log('post arry', Post.array());
+    // console.log(Post.array()[0][0]);
+    // console.log(Post.array()[0][1]);
     response.data = Post.array()[0][0];
 
-    var redisArray = [];
+    let redisArray = [];
     for(var i = 0; i < Post.array()[0].length; i++){
 
-      if(Post.array()[0][i].menu.length != 0 ){
-        redisArray.push(Post.array()[0][i].menu);
+      console.log('post array', Post.array()[0][i]);
+      if(Post.array()[0][i].length != 0 ){
+        let obj = {};
+        console.log('')
+        obj.menu = Post.array()[0][i].menu;
+        obj.type = Post.array()[0][i].type;
+        redisArray.push(obj);
       }
     }
 
     console.log('redisArray', redisArray);
 
     for(var i = 0 ;i < redisArray.length; i++ ){
+
       redis.hset("today", redisArray[i].type, redisArray[i].menu, redis.print);
     }
 
@@ -192,7 +200,8 @@ var Post = (function() {
     var empty = function() {
         //var object = menuArray]0];
         for (var i in menuArray[0]) {
-            if (JSON.stringify(menuArray[0][i]) === JSON.stringify({})) {
+            //if (JSON.stringify(menuArray[0][i]) === JSON.stringify({})) {
+            if (menuArray[0][i].length == 0) {
                 menuArray[0].remove(i);
             }
         }
@@ -209,7 +218,8 @@ var Post = (function() {
 
     var sendPost = function(index) {
 
-        options.url = 'http://www.guro.hs.kr/17572/subMenu.do?viewType=list&siteId=SEI_00000919&pageIndex=' + index + '&arrMlsvId=0&srhMlsvYear=' + Today.yearStr() + '&srhMlsvMonth=' + 03/**Today.monthStr()*/;
+        //options.url = 'http://www.guro.hs.kr/17572/subMenu.do?viewType=list&siteId=SEI_00000919&pageIndex=' + index + '&arrMlsvId=0&srhMlsvYear=' + Today.yearStr() + '&srhMlsvMonth=' + 03/**Today.monthStr()*/;
+        options.url = 'http://www.guro.hs.kr/17572/subMenu.do?viewType=list&siteId=SEI_00000919&pageIndex=1&arrMlsvId=0&srhMlsvYear=2018&srhMlsvMonth=03';
         var promise = new Promise(function(resolve, reject) {
 
             request.post(options, function(error, response, body) {
@@ -294,15 +304,16 @@ Menu.prototype = function() {
 
     var getMenuObject = function() {
 
-        var result = {'menu' : []};
+        var result ={};
         //console.log(this.dom[0].innerHTML);
         //console.log(this.dom[0].querySelctorAll('td'));
+        let index = 0;
         for (var i = 0; i < this.dom.length; i++) {
 
             //console.log(this.dom[i].innerHTML);
             //trDom = new JSDOM(this.dom[i].innerHTML);
             const trDom = new JSDOM('<table>' + this.dom[i].innerHTML + '</table>');
-            td = trDom.window.document.querySelectorAll('td');
+            var td = trDom.window.document.querySelectorAll('td');
 
             //console.log(trDom.window.document.querySelectorAll('td').length);
             //console.log(trDom.window.document.querySelectorAll('td')[0].innerHTML);
@@ -317,11 +328,13 @@ Menu.prototype = function() {
                 object.kal = td[4].textContent;
 
                 Post.regExp(object);
-                result.menu.push(object);
+                //result.push(object);
+                result[index] = object;
             }
 
-            if(i == this.dom.length -1 &&  result.menu.length == 0){
-              result.menu.push(object);
+            if(i == this.dom.length -1 &&  result.length == 0){
+              //result.push(object);
+              result[index] = object
             }
 
         }
