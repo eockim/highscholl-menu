@@ -34,11 +34,11 @@ class micro extends require('./tcp-server.js'){
 if(cluster.isMaster){
 
   console.log('Master ${process.pid} is running');
-  for (let i = 0; i < numCPU; i++) {                   // 5. 코어 수 만큼 자식 프로세스 실행
+  for (let i = 0; i < numCPU; i++) {                   
     cluster.fork();
   }
 
-  cluster.on('exit', (worker, code, signal) => {        // 6. 자식 프로세스 종료 이벤트 감지
+  cluster.on('exit', (worker, code, signal) => {       
     console.log('worker ${worker.process.pid} died');
     // elastic.index({
     //   index: 'microservice',                          // index
@@ -51,3 +51,4 @@ if(cluster.isMaster){
 
   new micro();
 }
+new micro();
