@@ -2,6 +2,7 @@
 var exports = module.exports = {};
 var request = require('request');
 const jsdom = require('jsdom');
+const TodayUtil = require('../util/TodayUtil');
 const {
     JSDOM
 } = jsdom;
@@ -68,7 +69,7 @@ var menu = function(guroMenuIndex, params, callBack){
 
     }
 
-    let expireTime = Today.getRemainSeconds();
+    let expireTime = TodayUtil.getRemainSeconds();
     for(var i = 0 ;i < redisArray.length; i++ ){
 
       redis.hset("today", redisArray[i].type, redisArray[i].menu, redis.print);
@@ -116,63 +117,7 @@ exports.requestMenu = function(params, callBack){
 
   });
 
-
-
 }
-
-var Today = (function() {
-
-    var date = new Date();
-
-    var getYearStr = function() {
-        return date.getFullYear();
-    }
-
-    var getMonthStr = function() {
-        return date.getMonth() + 1 < 10 ? '0' + (date.getMonth() * 1 + 1) : date.getMonth();
-    }
-
-
-    var getDateStr = function() {
-        return date.getDate() + 1 < 10 ? '0' + (date.getDate() * 1) : date.getDate();
-    }
-
-    var getFullStr = function() {
-        return getYearStr() + '.' + getMonthStr() + '.' + getDateStr();
-    }
-
-    var getRemainSeconds = function(){
-      return 24 * 60 * 60 - (date.getHours() * 60  * 60 ) + (date.getMinutes() * 60) + date.getSeconds();
-    }
-
-    return {
-        yearStr: getYearStr,
-        monthStr: getMonthStr,
-        dateStr: getDateStr,
-        fullStr: getFullStr,
-        getRemainSeconds : getRemainSeconds
-    };
-
-})();
-
-var HighObject = (function() {
-
-    var isEmpty = function(obj) {
-        for (var key in obj) {
-            if (obj.hasOwnProperty(key)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-
-
-    return {
-        isEmpty: isEmpty
-    };
-
-})();
 
 var Post = (function() {
 
@@ -237,7 +182,7 @@ var Post = (function() {
 
     var sendPost = function(index) {
 
-        options.url = 'http://www.guro.hs.kr/17572/subMenu.do?viewType=list&siteId=SEI_00000919&pageIndex=' + index + '&arrMlsvId=0&srhMlsvYear=' + Today.yearStr() + '&srhMlsvMonth=' +Today.monthStr();
+        options.url = 'http://www.guro.hs.kr/17572/subMenu.do?viewType=list&siteId=SEI_00000919&pageIndex=' + index + '&arrMlsvId=0&srhMlsvYear=' + TodayUtil.getYearStr() + '&srhMlsvMonth=' + TodayUtil.getMonthStr();
         // options.url = 'http://www.guro.hs.kr/17572/subMenu.do?viewType=list&siteId=SEI_00000919&pageIndex=' + index + '&arrMlsvId=0&srhMlsvYear=2018&srhMlsvMonth=03';
         var promise = new Promise(function(resolve, reject) {
 
@@ -266,7 +211,7 @@ var Post = (function() {
     var initPost = function(params, callBack){
 
       options = {
-        url: 'http://www.guro.hs.kr/17572/subMenu.do?viewType=list&siteId=SEI_00000919&pageIndex=1&arrMlsvId=0&srhMlsvYear=' + Today.yearStr() + '&srhMlsvMonth=' + Today.monthStr(),
+          url: 'http://www.guro.hs.kr/17572/subMenu.do?viewType=list&siteId=SEI_00000919&pageIndex=1&arrMlsvId=0&srhMlsvYear=' + TodayUtil.getYearStr() + '&srhMlsvMonth=' + TodayUtil.getMonthStr(),
         // url : 'http://www.guro.hs.kr/17572/subMenu.do?viewType=list&siteId=SEI_00000919&pageIndex=1&arrMlsvId=0&srhMlsvYear=2018&srhMlsvMonth=03',
         method: 'POST',
         headers: {
